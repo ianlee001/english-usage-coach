@@ -9,6 +9,7 @@ __pycache__/
 .idea/
 data/
 uploads/
+.preview/
 *.log
 *.sqlite
 *.sqlite-*

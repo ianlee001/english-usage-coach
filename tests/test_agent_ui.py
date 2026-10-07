@@ -1,13 +1,10 @@
-from dataclasses import replace
-
 import pytest
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from pydantic import Field
-from streamlit.testing.v1 import AppTest
 
-from english_coach.config import ROOT, AppError
+from english_coach.config import AppError
 from english_coach.runtime import Runtime
 
 
@@ -84,29 +81,27 @@ def test_failed_turn_is_not_replayed_and_error_is_redacted(settings):
     runtime.close()
 
 
-def test_streamlit_without_keys_shows_setup_and_can_start_new_chat(settings, monkeypatch):
-    config = replace(settings, api_key="", base_url="", embedding_endpoint="")
-    monkeypatch.setattr("english_coach.config.Settings.load", lambda: config)
-    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=40).run()
-    assert not app.exception
-    assert app.chat_input[0].disabled
-    assert any(".env.example" in item.value for item in app.info)
-    next(button for button in app.button if button.label == "＋ 新建聊天").click().run()
-    assert not app.exception
-    assert len(app.selectbox[0].options) == 2
-
-
-def test_streamlit_chat_displays_answer_and_persists(settings, monkeypatch):
-    monkeypatch.setattr("english_coach.config.Settings.load", lambda: settings)
-    monkeypatch.setattr(
-        "english_coach.runtime.init_chat_model",
-        lambda **_: ScriptedModel(responses=[AIMessage(content="keep it down：小声一点。")]),
+def test_agent_call_budget_stops_repeated_tool_loop(settings):
+    runtime = Runtime(settings)
+    thread = runtime.catalog.new_conversation()
+    model = ScriptedModel(
+        responses=[
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "search_materials",
+                        "args": {"query": "x"},
+                        "id": f"call_{index}",
+                        "type": "tool_call",
+                    }
+                ],
+            )
+            for index in range(10)
+        ]
     )
-    app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=40).run()
-    assert not app.exception
-    app.chat_input[0].set_value("keep it down 是什么意思？").run()
-    assert not app.exception
-    assert any("小声一点" in item.value for item in app.markdown)
-    app.run()
-    assert not app.exception
-    assert len(app.chat_message) == 2
+    with pytest.raises(AppError):
+        runtime.chat(thread, "反复查询", model=model)
+    assert len(model.seen) == 6
+    assert runtime.catalog.turns(thread)[0]["status"] == "failed"
+    runtime.close()

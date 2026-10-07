@@ -6,6 +6,7 @@ import threading
 from typing import Callable
 
 from langchain.agents import create_agent
+from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
 from langchain.chat_models import init_chat_model
 from langchain_core.messages import AIMessage, AIMessageChunk, HumanMessage
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -13,6 +14,7 @@ from langgraph.config import get_stream_writer
 
 from english_coach.config import AppError, Settings, safe_error
 from english_coach.knowledge import KnowledgeBase
+from english_coach.learning import LearningStore
 from english_coach.prompts import system_prompt
 from english_coach.storage import Catalog
 from english_coach.tools import build_tools
@@ -36,16 +38,21 @@ class Runtime:
         settings.ensure_dirs()
         self.lock = threading.RLock()
         self.catalog = Catalog(settings.data_dir / "catalog.sqlite")
+        self.learning = LearningStore(self.catalog)
         self.knowledge = KnowledgeBase(settings, self.catalog)
         self.connection = sqlite3.connect(
             settings.data_dir / "checkpoints.sqlite", check_same_thread=False, timeout=30
         )
         self.checkpointer = SqliteSaver(self.connection)
         self.checkpointer.setup()
+        self.closed = False
         atexit.register(self.close)
 
     def close(self):
         with self.lock:
+            if self.closed:
+                return
+            self.closed = True
             self.connection.close()
             if hasattr(self.knowledge.embeddings, "close"):
                 self.knowledge.embeddings.close()
@@ -100,9 +107,15 @@ class Runtime:
 
             agent = create_agent(
                 model=model,
-                tools=build_tools(self.settings, self.knowledge, sources, emit_tool_status),
+                tools=build_tools(
+                    self.settings, self.knowledge, sources, emit_tool_status, self.learning
+                ),
                 system_prompt=system_prompt([row["name"] for row in self.catalog.documents()]),
                 checkpointer=self.checkpointer,
+                middleware=[
+                    ModelCallLimitMiddleware(run_limit=6, exit_behavior="error"),
+                    ToolCallLimitMiddleware(run_limit=8, exit_behavior="error"),
+                ],
             )
             history = self.catalog.turns(thread_id)
             if history and history[-1]["status"] != "complete":
@@ -115,7 +128,7 @@ class Runtime:
                 # 每轮只提交一条新增消息；不要重复把 UI 历史再次塞给 checkpointer。
                 events = agent.stream(
                     {"messages": [HumanMessage(content=question, id=turn_id)]},
-                    {"configurable": {"thread_id": thread_id}, "recursion_limit": 16},
+                    {"configurable": {"thread_id": thread_id}, "recursion_limit": 64},
                     stream_mode=["messages", "updates", "custom"],
                 )
                 for mode, payload in events:

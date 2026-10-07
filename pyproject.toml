@@ -1,11 +1,14 @@
 [project]
 name = "english-ai-coach"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local English usage coach with Qwen, MinerU, Tavily, Chroma and SQLite"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-    "streamlit>=1.45,<2",
+    "fastapi>=0.115,<1",
+    "uvicorn>=0.34,<1",
+    "python-multipart>=0.0.20,<1",
+    "youtube-transcript-api>=1.2,<2",
     "python-dotenv>=1,<2",
     "langchain>=1,<2",
     "langchain-core>=1,<2",

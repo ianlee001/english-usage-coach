@@ -29,7 +29,7 @@ class TimedTavilyAPI(TavilySearchAPIWrapper):
             return response.json()
 
 
-def build_tools(settings: Settings, knowledge, sources: list[dict], on_status):
+def build_tools(settings: Settings, knowledge, sources: list[dict], on_status, learning=None):
     @tool
     def search_materials(query: str, filename: str = "") -> str:
         """检索用户上传的英语笔记/教材。query 应为结合上下文的简短查询；filename 可指定完整文件名。"""
@@ -114,4 +114,27 @@ def build_tools(settings: Settings, knowledge, sources: list[dict], on_status):
         except Exception as exc:
             return "联网搜索失败：" + safe_error(exc) + " 不得假装完成了实时核查。"
 
-    return [search_materials, web_search]
+    @tool
+    def search_vocabulary(query: str = "", video_id: str = "") -> str:
+        """查找实际伴学中保存的单词/词组与来源视频。query 是表达或中文含义；留空返回最近条目。"""
+        on_status("正在查询单词本…")
+        if learning is None:
+            return "单词本尚不可用。"
+        try:
+            entries = learning.vocabulary(query[:120], video_id)[:10]
+            return json.dumps(entries, ensure_ascii=False)[:24000]
+        except Exception as exc:
+            return "单词本查询失败：" + safe_error(exc)
+
+    @tool
+    def get_video_context(video_id: str, position: float = 0) -> str:
+        """根据 YouTube 视频 ID 和秒数，读取已导入视频的附近字幕。视频 ID 可先从单词本查询得到，不可编造。"""
+        on_status("正在读取视频语境…")
+        if learning is None:
+            return "视频资料尚不可用。"
+        try:
+            return json.dumps(learning.context(video_id, position), ensure_ascii=False)
+        except Exception as exc:
+            return "视频语境查询失败：" + safe_error(exc)
+
+    return [search_materials, web_search, search_vocabulary, get_video_context]

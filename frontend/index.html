@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>语境 · English Coach</title><link rel="stylesheet" href="/assets/styles.css"><script src="/assets/app.js" defer></script></head>
+<body>
+<aside class="rail">
+  <a class="brand" href="#chat"><span class="logo">语</span><span>语境<small>ENGLISH COACH</small></span></a>
+  <button id="new-chat" class="primary">＋ 开始新对话</button>
+  <nav aria-label="主导航"><button data-view="chat" class="active">◌　学习对话</button><button data-view="vocabulary">▤　我的单词本</button><button data-view="materials">▧　学习资料</button><button data-view="companion">↗　视频伴学</button></nav>
+  <div class="rail-label">最近对话</div><div id="conversations" class="history"></div>
+  <div class="rail-footer"><span class="dot"></span> 本地学习空间<small>在真实语境里，理解自然英语。</small></div>
+</aside>
+<main>
+  <header><div><span class="eyebrow">YOUR EVERYDAY ENGLISH SPACE</span><h1 id="page-title">学习对话</h1></div><span id="model-status" class="badge">连接中</span></header>
+  <div id="notice" class="notice" role="status" hidden></div>
+  <section id="chat" class="view">
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <form id="chat-form" class="composer"><label for="question" class="sr-only">输入英语问题</label><textarea id="question" maxlength="6000" rows="3" placeholder="一个词组、一句台词，或者你想说得更自然的话…"></textarea><div class="composer-bottom"><span id="chat-status">中文讲解 · 英文例句 · 保留学习语境</span><button id="send" class="primary" type="submit">发送 ↗</button></div></form>
+  </section>
+  <section id="vocabulary" class="view" hidden>
+    <p class="lead">看视频时遇到的表达，留在这里慢慢掌握。</p>
+    <form id="vocab-filters" class="filters"><input id="vocab-query" aria-label="搜索表达或含义" placeholder="搜索表达或中文含义"><select id="vocab-video" aria-label="按来源视频筛选"><option value="">所有来源视频</option></select><select id="vocab-state" aria-label="学习状态"><option value="">全部状态</option><option value="false">待学习</option><option value="true">已掌握</option></select><label><input id="vocab-favorite" type="checkbox"> 仅收藏</label><button type="submit">查询</button></form>
+    <p id="vocab-count" class="muted"></p><div id="vocab-list" class="card-grid"></div>
+  </section>
+  <section id="materials" class="view" hidden>
+    <p class="lead">把自己的笔记、教材变成可以追问的学习资料。</p>
+    <form id="upload-form" class="panel"><h2>导入资料</h2><p class="muted">支持 UTF-8 TXT / Markdown，以及经 MinerU 解析的 PDF / DOCX。</p><input id="document-file" type="file" accept=".txt,.md,.pdf,.docx" required><button id="upload-button" class="primary" type="submit">导入知识库</button><p id="upload-status" role="status"></p></form>
+    <div id="document-list" class="document-list"></div>
+  </section>
+  <section id="companion" class="view" hidden>
+    <p class="lead">YouTube 播放到难点时，浏览器侧栏给你一句恰好的解释。</p>
+    <div class="two-column"><div class="panel"><h2>连接浏览器侧栏</h2><ol><li>启动本地服务，并保持这个服务运行。</li><li>在 Chrome 扩展管理页开启开发者模式，加载项目的 <code>extension</code> 文件夹。</li><li>复制下方连接码，粘贴到扩展侧栏的连接设置。</li><li>打开 YouTube 普通视频，点击扩展图标，再点“开始伴学”。</li></ol><button id="pair-button">显示连接码</button><div id="pair-result" hidden><input id="pair-token" readonly aria-label="本地连接码"><button id="copy-token">复制</button><p class="muted">只在你自己的扩展里使用。模型 API Key 始终留在后端。</p></div></div>
+    <div class="panel accent"><span class="eyebrow">LESS INTERRUPTION, MORE CONTEXT</span><h2>只在值得停留的地方出现</h2><p>侧栏展示难点词组与简短解释。原句默认折叠，实际播放并展示过的条目才会进入单词本。</p><p>人工英文字幕优先；没有人工字幕时尝试自动英文字幕。第一版不处理直播、Shorts、无字幕视频或画面中的硬字幕。</p></div></div>
+    <form id="subtitle-form" class="panel"><h2>字幕获取失败？导入英文字幕</h2><p class="muted">准备该视频对应的 UTF-8 SRT / VTT。导入后，在扩展中重新开始伴学。</p><div class="filters"><input id="subtitle-video" placeholder="YouTube 链接或视频 ID" aria-label="视频链接" required><input id="subtitle-title" placeholder="视频标题（可选）" aria-label="视频标题"><input id="subtitle-file" type="file" accept=".srt,.vtt" required><button type="submit">导入字幕</button></div><p id="subtitle-status" role="status"></p></form>
+  </section>
+</main>
+</body></html>
+

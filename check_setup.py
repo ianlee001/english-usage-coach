@@ -14,7 +14,9 @@ def main():
         print("本项目需要 Python 3.13，请使用项目 .venv 解释器。")
         return 1
     for package in [
-        "streamlit",
+        "fastapi",
+        "uvicorn",
+        "youtube-transcript-api",
         "langchain",
         "langchain-openai",
         "langchain-chroma",

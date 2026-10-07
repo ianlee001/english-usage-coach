@@ -1,273 +1,216 @@
-# English Usage Coach｜英语用法学习助手
+# 语境 · English Usage Coach
 
-一个基于 Streamlit 与 LangChain 的英语用法教练：解释自然表达、按需联网核实近期用法、检索上传资料，并在 SQLite 中保存/恢复聊天。
+**第二版 · v0.2.0**：从英语学习对话，扩展到「看视频遇到难点 → 侧栏解释 → 单词本复习」。沿用同一仓库，保留第一版历史。
 
-面向英语表达学习的本地单用户 MVP，将多轮问答、个人资料检索和按需联网搜索整合到同一个聊天界面。
+[实际运行演示](docs/demo.md) · [版本变化](CHANGELOG.md) · [第一版演示存档](docs/demo-v1.md) · [接口说明](docs/api.md)
 
-### 实际运行效果
+![YouTube 原生侧栏中的难点伴学](docs/screenshots/09-youtube-companion-v2.png)
 
-以下为本地测试时的真实界面截图。点击 [查看完整演示案例](docs/demo.md)，可阅读日常问答、联网搜索、PDF 检索与多轮上下文的过程、回答节选和复现步骤。
+上图由使用者提供，展示 DW News 视频旁的难点卡片和保存提示，拍摄于浅蓝配色调整前。当前主网页如下，4 个表达来自实际学习记录。
 
-| 根据 PDF 回答并标注来源 | 多轮对话承接上文 |
-|---|---|
-| ![根据上传资料回答时态问题，显示资料编号和页码](docs/screenshots/06-rag-answer.png) | ![后续提问中记住用户先前介绍的名字](docs/screenshots/07-context-recall.png) |
+![浅蓝色主网页中的真实单词本](docs/screenshots/10-vocabulary-v2.jpg)
 
-截图与回答是一次运行的记录；新运行的措辞与检索结果可能不同。可使用仓库自编的 [示例笔记](examples/english_notes.md) 体验资料检索。
+## 技术架构
 
-### 项目亮点
+Python 3.13 + uv + FastAPI REST 后端 + 原生 HTML/CSS/JavaScript 主网页 + Chrome Manifest V3 侧栏扩展。
 
-- **工具调用**：通过 LangChain Agent 按问题调用个人资料检索或 Tavily 网络搜索，并展示来源。
-- **持久化 RAG**：支持 PDF、DOCX、Markdown、TXT，经过解析、切分与向量化写入 Chroma；使用文件哈希去重，入库失败时回滚。
-- **会话恢复**：SQLite 分别保存用户可见聊天和 Agent checkpoint，支持切换会话与重启后恢复上下文。
-- **接口适配**：Qwen 聊天使用 OpenAI 兼容接口，Embedding 独立适配百炼原生多模态接口。
-- **可复现开发**：使用 Python 3.13、uv 锁定依赖；包含离线接口模拟、存储及界面测试。
+已从 Streamlit 迁移。原来的聊天、聊天历史、上传资料 RAG 保留；新增视频难点伴学、自动保存的单词本、收藏和已掌握状态。没有 MCP、React、Redis、Celery，也不需要 Node.js 来运行产品。
 
 ```mermaid
-flowchart TD
-    UI[Streamlit 聊天与资料上传] --> Agent[LangChain Agent / Qwen]
-    Agent --> Search[Tavily 联网搜索]
-    Agent --> Retrieve[个人资料检索工具]
-    Retrieve --> Chroma[(Chroma 持久化向量库)]
-    UI --> Parse[PDF / DOCX: MinerU\nMD / TXT: 本地读取]
-    Parse --> Split[文本切分与来源元数据]
-    Split --> Embed[百炼 Embedding 原生接口]
-    Embed --> Chroma
-    Agent --> Checkpoint[(SQLite Agent checkpoint)]
-    UI --> Catalog[(SQLite 会话与资料目录)]
+flowchart LR
+    Web[主网页：对话 / 资料 / 单词本] --> API[FastAPI 本地后端]
+    YouTube[YouTube 播放状态] --> Side[Chrome 原生侧栏]
+    Side --> API
+    API --> Agent[聊天 Agent / 四个工具]
+    API --> Video[字幕获取 / 分段分析 / 难点缓存]
+    Agent --> Qwen[Qwen / Tavily]
+    Agent --> RAG[MinerU / Embedding / Chroma]
+    Video --> Qwen
+    API --> SQLite[SQLite：历史 / 字幕 / 单词本]
 ```
 
-本仓库提供源代码和本地运行方式。GitHub 仓库链接可供查看实现；当前没有公开在线演示服务。
+## 1. 现在有哪些功能
 
-## 1. 固定方案与功能范围
+- **学习对话**：中文讲解、英文例句、流式回答、SQLite 历史、按需调用资料检索/联网搜索/单词本/视频语境工具。
+- **学习资料**：TXT/MD 本地解析，PDF/DOCX 用 MinerU；分块、Embedding、Chroma 持久化；回答保留来源。
+- **视频伴学**：Chrome 原生侧栏，自动识别正在看的 YouTube 普通视频。优先人工英文字幕，否则尝试自动英文字幕。按英语水平筛选少量难点，普通句子不显示卡片。
+- **难点卡片**：表达、语境含义、短说明；原句和翻译默认折叠；支持重播这句、收藏、已掌握。
+- **单词本**：只自动保存实际播放时显示过的难点。提前分析只是缓存，拖动跳过的内容不会批量加入。可按表达/中文含义、视频、状态、收藏筛选；回到视频对应时间复习。
+- **字幕后备导入**：YouTube 获取失败时，在主网页导入该视频对应的 UTF-8 英文 SRT/VTT。
 
-| 项目 | 本项目方案 |
-|---|---|
-| Python / 依赖 | Python 3.13；uv + pyproject.toml + uv.lock |
-| 页面 | Streamlit，绑定本机 127.0.0.1 |
-| 聊天 | qwen3.8-omni-flash；OpenAI-compatible Chat Completions；文本流式输出 |
-| Agent | LangChain create_agent；按问题选择工具 |
-| Embedding | tongyi-embedding-vision-flash；百炼原生多模态 HTTP API；768 维 |
-| PDF / DOCX | MinerU precision，默认 OCR；PDF 按页解析以保留页码 |
-| TXT / Markdown | 本地直接读取 UTF-8 文本，不必发送 MinerU |
-| 资料索引 | 本地 Chroma，文件哈希去重，入库失败回滚 |
-| 聊天存储 | SQLite SqliteSaver 保存 Agent 状态；另一 SQLite 保存界面记录、会话列表和资料目录 |
-| 网络搜索 | Tavily 工具；未配置或搜索失败时明确提示 |
+模型沿用 `qwen3.8-omni-flash`，Embedding 沿用 `tongyi-embedding-vision-flash`。字幕难点分析直接调用文本模型，不使用音频、视频流或 Embedding。中文解释由 Qwen 生成；第一版没有额外抓取 YouTube 中文自动翻译。
 
-当前 UI 是纯文本聊天与文档上传。模型虽然支持多模态，本版索引的是 MinerU 提取的文字，不自动保存图像向量，不提供音视频聊天、发音评分、登录、单词本、学习统计或云部署。
+## 2. 安装与启动（Windows）
 
-多模态能力不等于知识库。文档仍需解析、切分和向量化，再根据问题检索。聊天模型与 Embedding 模型承担不同任务。
-
-## 2. 最快启动（Windows PowerShell）
-
-下载或克隆本仓库后，在终端进入**包含 `app.py` 和 `pyproject.toml` 的项目根目录**。例如将仓库解压到 `D:\projects\english-usage-coach` 后：
+先安装 Git 和 uv。首次下载项目，在 PowerShell 执行：
 
 ```powershell
-cd D:\projects\english-usage-coach
-uv sync --locked
-Copy-Item .env.example .env
+git clone https://github.com/ianlee001/english-usage-coach.git
+cd english-usage-coach
+uv sync --locked --python 3.13
 ```
 
-`Copy-Item` 只需第一次执行。已有 `.env` 时不要重复覆盖。用 PyCharm/文本编辑器填写 `.env`，然后运行：
+如果 uv 找不到你安装的 Python，可指定本机解释器路径，例如：
 
 ```powershell
-uv run python check_setup.py
-uv run --locked streamlit run app.py
+uv sync --locked --python D:\python\python.exe
 ```
 
-浏览器打开 http://localhost:8501 。终端保持运行，结束时按 Ctrl+C。也可以双击项目中的 `start_app.bat`。
+**已有 `.env` 就继续使用，不要覆盖。** 第一次配置时，复制 `.env.example` 为 `.env`，保存在本目录，与 `pyproject.toml` 同级。
 
-首次安装依赖需要联网。当前机器已有 Python 3.13；在其他机器可先执行 `uv python install 3.13`。如果没有 uv，参见 https://docs.astral.sh/uv/getting-started/installation/ 。
+必填/按功能填写：
 
-不要用 `python app.py` 启动 Streamlit。
+| 变量 | 用途 |
+| --- | --- |
+| `DASHSCOPE_API_KEY` | 聊天、字幕难点分析、Embedding |
+| `DASHSCOPE_BASE_URL` | 百炼业务空间的 OpenAI 兼容根地址，通常以 `/compatible-mode/v1` 结尾 |
+| `LLM_MODEL` | 默认 `qwen3.8-omni-flash` |
+| `EMBEDDING_MODEL` | 默认 `tongyi-embedding-vision-flash` |
+| `DASHSCOPE_EMBEDDING_ENDPOINT` | 官方地址可自动推导；自定义网关时显式填写原生多模态向量接口 |
+| `TAVILY_API_KEY` | 只有联网搜索需要 |
+| `MINERU_TOKEN` | PDF/DOCX 的 MinerU precision 解析需要 |
 
-## 3. .env 配置
+`.env.example` 中还有维度、分块、上传大小和超时设置。系统环境变量优先于 `.env`；修改后重启服务。
 
-`.env` 放在本目录，与 `pyproject.toml`、`app.py` 同级。它是运行配置，**不要通过页面的资料上传按钮上传**。真实密钥不需要发到聊天里；`.gitignore` 已排除 `.env` 和用户数据。
+检查配置并启动：
 
-必须填写的四项：
-
-```dotenv
-DASHSCOPE_API_KEY=你的百炼APIKey
-DASHSCOPE_BASE_URL=你的业务空间的OpenAI兼容根地址
-TAVILY_API_KEY=你的TavilyAPIKey
-MINERU_TOKEN=你的MinerU令牌
+```powershell
+uv run --locked python check_setup.py
+uv run --locked python -m backend.server
 ```
 
-默认模型已填写，不需要另选：
+也可以双击 **`start_app.bat`**。启动后打开：
 
-```dotenv
-LLM_MODEL=qwen3.8-omni-flash
-EMBEDDING_MODEL=tongyi-embedding-vision-flash
-EMBEDDING_DIMENSIONS=768
-MINERU_MODE=precision
+**http://127.0.0.1:8000**
+
+`uv run --locked python app.py` 也可启动同一个新后端。旧命令 `streamlit run app.py` 已不再适用。
+
+保持终端运行，`Ctrl+C` 停止。主网页可以关闭，扩展仍能访问运行中的后端。若 8000 被占用，可在当前 PowerShell 设置端口：
+
+```powershell
+$env:COACH_PORT = "8008"
+uv run --locked python -m backend.server
 ```
 
-### 两种百炼接口的区别
+然后主网页和扩展都改用 `http://127.0.0.1:8008`。第一版只支持本机单用户、单进程运行，请勿添加 `--workers` 或对公网暴露。
 
-聊天使用 OpenAI 兼容地址，例如控制台提供的 `https://业务空间ID.cn-beijing.maas.aliyuncs.com/compatible-mode/v1`。请复制你自己地域和业务空间的真实地址，不要照抄占位符，也不要附加 `/chat/completions`。
+## 3. 在 PyCharm 中打开
 
-Embedding 使用**原生多模态**路径：
+1. `File → Open`，选择克隆得到的 `english-usage-coach` 文件夹，确认其中有 `pyproject.toml`。
+2. 在 PyCharm Terminal 中执行 `uv sync --locked --python 3.13`。
+3. `Settings → Project → Python Interpreter → Add Interpreter → Existing`，选择项目的 `.venv\Scripts\python.exe`。
+4. 创建 Python 运行配置：运行类型选 **Module name**，填写 `backend.server`；工作目录为项目根目录。
+5. 点击运行，浏览器打开 `http://127.0.0.1:8000`。
+6. 前端是普通静态文件，不需要 npm install。改 HTML/CSS/JS 后刷新页面；改 Python 后重启服务。
+
+## 4. 安装 Chrome 侧栏扩展
+
+只需做一次：
+
+1. 启动后端，并打开主网页。
+2. 在 Chrome 地址栏输入 `chrome://extensions`。
+3. 打开右上角“开发者模式”，点击“加载已解压的扩展程序”。
+4. 选择项目根目录中的 **`extension`** 文件夹。
+5. 将“语境 · YouTube 难点伴学”固定到工具栏。
+6. 在主网页进入“视频伴学”，点击“显示连接码”并复制。
+7. 打开 YouTube 页面，点击扩展图标；在侧栏“连接设置”填写服务地址和连接码，点击“保存并连接”。
+8. **刷新安装扩展前已经打开的 YouTube 页面。** 更新扩展代码后，也要在扩展管理页点击重新加载，再刷新 YouTube。
+
+Chrome 的设置决定原生侧栏出现在左边还是右边。需要右侧时在浏览器设置中选择右侧。扩展不是播放器全屏中的悬浮层，第一版请使用普通观看模式。
+
+连接码是本地服务的凭证，不是百炼 API Key；生成在 `data/local_api_token.txt`（或你的自定义 DATA_DIR），不要提交到 Git。丢失时可回主网页重新查看。更换电脑或删除此文件后需要重新配对。扩展不会读取或存储百炼密钥。
+
+## 5. 每次怎样使用视频伴学
+
+1. 运行 `start_app.bat` 或启动 PyCharm 后端配置。
+2. 打开一个 YouTube 普通英语视频（`https://www.youtube.com/watch?v=...`）。
+3. 点击扩展，设置初级/中级/高级，点击“开始伴学”。
+4. 程序获取全文英文字幕，在后台分析当前分钟和下一分钟，之后跟随播放滚动准备。首段可能需要等待模型响应，来不及显示的片段可回放。
+5. 只有播放到难点时才出现卡片，并自动加入单词本；侧栏“单词本”按钮可打开主网页。
+6. 可以暂停伴学；再次开始会复用字幕和已完成的分析缓存。切换视频或标签页会停止当前伴学，防止把别的视频时间套进旧字幕。
+7. 首版每分钟最多生成 3 个难点，同一轮伴学中同一表达不重复提示，已标记掌握的表达会过滤。模型只是估计难度。
+
+关闭主网页不会停止后端。关闭侧栏会停止后续请求；已经发出的模型请求可能完成并留下缓存，但不会把尚未展示的难点加入单词本。服务重启后旧会话会暂停，需要重新点击开始。
+
+字幕不能自动获取时：在主网页“视频伴学”底部输入视频链接/ID，选择对应英文 SRT/VTT 导入，然后重新开始伴学。导入字幕应对应原视频时间轴。
+
+限制：第一版不处理直播、Shorts、无字幕视频、烧录在画面里的硬字幕、语音识别或多模态画面理解。自动字幕可能转写错误，解释不一定准确。`youtube-transcript-api` 依赖非公开网站接口，网络/平台改动/请求限制可能使个别视频无法获取；导入字幕入口可继续使用。浏览器能访问 YouTube 不一定代表 Python 进程也能访问，请检查本机网络配置。
+
+## 6. 文件结构与作用
 
 ```text
-/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding
+english-usage-coach/
+├─ app.py                     # 兼容入口，转到 FastAPI 启动器
+├─ backend/
+│  ├─ __init__.py
+│  └─ server.py               # REST、聊天流、认证、中间件、后台任务生命周期
+├─ frontend/
+│  ├─ index.html              # 主网页四个区域：聊天/单词本/资料/伴学设置
+│  ├─ styles.css              # 主网页样式与响应式布局
+│  └─ app.js                  # 接口调用、聊天流渲染、筛选、收藏和导入
+├─ extension/
+│  ├─ manifest.json           # Chrome 扩展声明、权限、页面脚本
+│  ├─ background.js           # 侧栏入口和受信任扩展存储
+│  ├─ content.js              # 读取 YouTube 播放状态、定位重播
+│  ├─ core.js                 # 播放/跳转判断和难点触发的纯逻辑
+│  ├─ sidepanel.html          # 侧栏界面
+│  ├─ sidepanel.css           # 侧栏样式
+│  └─ sidepanel.js            # 配对、会话、轮询、卡片和自动保存
+├─ english_coach/
+│  ├─ config.py               # .env 配置、路径和安全错误信息
+│  ├─ runtime.py              # 聊天 Agent、调用次数限制、历史与失败恢复
+│  ├─ prompts.py              # 英语教学及资料使用规则
+│  ├─ tools.py                # 资料、联网、单词本、视频语境四个工具
+│  ├─ storage.py              # 原有聊天与文档目录 SQLite 表
+│  ├─ learning.py             # 字幕/会话/缓存/单词本/视频出处 SQLite 表
+│  ├─ video.py                # 字幕获取与解析、难点分析、后台任务和缓存
+│  ├─ knowledge.py            # MinerU、分块、Chroma 入库与检索
+│  └─ embeddings.py           # 百炼原生多模态 Embedding 适配
+├─ tests/                     # Python 集成测试与 Node 扩展逻辑测试
+├─ examples/                  # 可用于资料导入的示例笔记
+├─ docs/
+│  ├─ api.md                  # 接口和数据流程说明
+│  ├─ verification.md         # 本次验证记录与未实测范围
+│  ├─ demo.md                 # 第二版视频伴学与单词本真实演示
+│  ├─ demo-v1.md              # 第一版 Streamlit 演示存档
+│  └─ streamlit_readme.md     # 迁移前 README 存档
+├─ CHANGELOG.md               # 版本变化与升级说明
+├─ .env.example               # 配置模板；真实 .env 不提交
+├─ .python-version            # Python 3.13
+├─ pyproject.toml             # uv 依赖与测试工具配置
+├─ uv.lock                    # 锁定的依赖版本
+├─ check_setup.py             # 离线配置检查，不显示密钥
+└─ start_app.bat              # Windows 启动脚本
 ```
 
-程序仅对官方 `dashscope.aliyuncs.com`、`dashscope-intl.aliyuncs.com`、`dashscope-us.aliyuncs.com` 及业务空间 `*.maas.aliyuncs.com` 主机尝试沿用主机并替换路径。套餐主机、代理和其他主机不做推导。若所在地域/空间提供的原生地址不同，应明确填写完整地址：
+运行产生 `data/`、`uploads/`、`.venv/`，均已忽略。后端同时提供前端静态文件与 `/api/`，代码分层、数据走 REST，本地不需要另开一个前端开发服务器。
 
-```dotenv
-DASHSCOPE_EMBEDDING_ENDPOINT=https://你的原生API主机/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding
-```
+## 7. 数据迁移与机制
 
-北京旧版公共域名示例为 `https://dashscope.aliyuncs.com/api/v1/services/embeddings/multimodal-embedding/multimodal-embedding`，**不是所有地域通用**。Key 必须有该地域/空间内两个模型的调用权限。套餐专用 Key/地址不能假定支持多模态向量接口。
+首次启动新后端时，会把已有 `catalog.sqlite`、`checkpoints.sqlite` 一致性备份到 `data/backups/before_web_migration/`，随后增量建表。保留原聊天、文档和 Chroma；不会主动清空数据库。请继续使用原有 DATA_DIR、UPLOAD_DIR 和 Embedding/分块配置。
 
-Embedding 适配在 `english_coach/embeddings.py` 中实现，不使用 `OpenAIEmbeddings`，也无需第二种 Embedding 密钥。`httpx` 直接调用原生 API，因此不必再安装 DashScope SDK。
+- `catalog.sqlite`：聊天显示记录、文档目录，以及新的视频/单词本表。
+- `checkpoints.sqlite`：Agent 内部对话状态。
+- `chroma/`：资料向量索引；更换向量模型/维度不能混用旧索引。
+- 模型与工具调用有每轮次数上限。字幕分析是固定 Python 流程，不经过自由工具循环。
+- 相同英文表达和相同中文含义才合并为一个单词本条目；不同语境保留来源，不做不可靠的自动词义合并。
+- 分析缓存按视频、字幕版本、难度、模型及分析版本区分；缓存里的空结果也会保留，避免反复分析普通句子。
+- API 记录请求编号、路径、状态和耗时，不记录密钥或完整字幕。
+- 网页使用同源请求和 HttpOnly cookie；扩展通过本地主机权限和 Bearer 连接码访问。未开放任意来源 CORS，也没有完整账号体系。
+- 聊天使用 HTTP NDJSON 流返回文本，其他功能使用 JSON REST；扩展每 2 秒取结果，播放时间在浏览器本地判断，不需要 WebSocket。
 
-### 其他设置
-
-`.env.example` 中包含可选项。通常保持默认即可：
-
-- `MINERU_LANGUAGE=en`：默认英语；中文笔记较多时可改 `ch`。
-- `MINERU_OCR=true`：precision 模式开启 OCR。
-- `MINERU_TIMEOUT=300`：每次 MinerU 解析请求的等待时间，PDF 按页处理总时间可能更长。
-- `MAX_UPLOAD_MB=20`：应用层文件大小上限；如提高，还需同步改 `.streamlit/config.toml` 的服务器上限。
-- `CHUNK_BYTES=900`：保守 UTF-8 字节长度，不是 token 数。为所选模型的 1024-token 上限留余量。
-- `RAG_TOP_K=5`：检索候选片段数。返回候选不保证一定相关，Agent 需判断。
-- `DATA_DIR=data`、`UPLOAD_DIR=uploads`：相对项目根目录定位，不受 PyCharm 当前终端位置影响。
-
-配置读取顺序：系统环境变量优先，其次 `.env`。如修改后不生效，检查 PyCharm Run Configuration 中是否设置了同名环境变量。页面点击“重新读取配置”即可更新；必要时停止后重启。
-
-## 4. 在 PyCharm 中打开
-
-1. 打开 PyCharm，选择 **File → Open**（欢迎页可直接 Open）。
-2. 选择下载后的项目根目录，作为项目打开；不要只打开 `app.py`。
-3. 打开底部 **Terminal**，确认当前目录是该项目，执行 `uv sync --locked`。
-4. 设置解释器：**Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter**。可使用 uv 环境选项；最直接的方式是选择已有解释器：
-
-   ```text
-   <项目根目录>\.venv\Scripts\python.exe
-   ```
-
-   不同 PyCharm 版本菜单文字略有差别，目标是选中项目 `.venv` 中的 Python 3.13。
-5. 从 `.env.example` 复制得到 `.env`，填写四项配置；不要把密钥写到 Python 代码中。
-6. 初次推荐在 Terminal 执行 `uv run --locked streamlit run app.py`。
-
-### 配置绿色运行按钮
-
-**Run → Edit Configurations → ＋ → Python**，填写：
-
-| 字段 | 值 |
-|---|---|
-| Name | English Coach |
-| Run target / Module name | `streamlit`（切换到模块方式，不是脚本路径） |
-| Parameters | `run app.py` |
-| Working directory | 下载后的项目根目录 |
-| Python interpreter | 项目 `.venv\Scripts\python.exe` |
-
-Apply / OK 后点运行。`.env` 由项目自身加载，不需要安装 PyCharm dotenv 插件。
-
-官方 uv 环境说明：https://www.jetbrains.com/help/pycharm/uv.html
-
-## 5. 使用与验收
-
-### 聊天
-
-输入 `What does psych yourself out mean?`，再问“再给一个例句”。AI 应承接上文。新建聊天生成新 thread_id，旧会话仍可在侧栏选择。页面重开默认选最近的会话；SQLite 中的记录与上下文会恢复。
-
-### 搜索
-
-问“这个 slang 在 2026 年还常用吗？”时应看到搜索状态和网页来源。搜索内容是证据，不是全体母语者的频率统计。没有 Tavily Key 或请求失败时不得假装已查到最新资料。
-
-### 上传
-
-选择 PDF / DOCX / MD / TXT 后，点击“导入选中的资料”。PDF/Word 发送到 MinerU 云端解析；提取的文本片段发送到百炼向量化。所有资料在本机资料库中供全部聊天使用。
-
-可以先上传 `examples/english_notes.md`，问“根据 english_notes.md 解释 draw on”。查看回答下方“本轮检索来源”，应显示文件、原文片段；PDF 还显示页码。重复导入同一文件会跳过。
-
-PDF 为保留准确页码采用 MinerU `split_pages=True`，会逐页解析，大文件比一次解析更慢。建议首次先用少量页面。Word/Markdown 无可靠页码时只显示文件和章节，不编造页码。
-
-测试“根据资料解释一个不存在的表达”，回答应说明未找到依据；若补充通用知识，应与资料内容区分。
-
-### 异常恢复
-
-入库失败不计入成功资料目录，并删除本次写入的片段；原文件和已解析文本保留用于重试。聊天失败会标注错误，丢弃半截工具状态；下轮从已完成对话重建上下文，不自动重新收费调用。
-
-## 6. 文件结构与每个文件的作用
-
-```text
-english_ai_app/
-├── app.py                       Streamlit 界面、上传、聊天显示、来源展开
-├── check_setup.py               离线检查 Python/包版本/配置是否填写，不调用 API
-├── start_app.bat                Windows 双击启动入口
-├── pyproject.toml               Python 版本范围、依赖、开发工具配置
-├── uv.lock                      锁定已解析的依赖版本
-├── .python-version              指定 Python 3.13
-├── .env.example                 无真实密钥的配置模板
-├── .env                         用户填写的配置（自行复制创建，不提交）
-├── .gitignore                   排除密钥、用户数据、虚拟环境和缓存
-├── .streamlit/config.toml       本机监听、上传上限、界面配色
-├── english_coach/
-│   ├── __init__.py              Python 包入口
-│   ├── config.py                环境配置、路径、参数校验、脱敏错误提示
-│   ├── embeddings.py            原生多模态 Embedding → LangChain 适配
-│   ├── knowledge.py             文档加载/缓存/切分/去重/Chroma 入库与检索
-│   ├── storage.py               会话列表、界面记录和资料目录的 SQLite 操作
-│   ├── prompts.py               英语教学、工具选择、引用和不确定性规则
-│   ├── tools.py                 search_materials、web_search 工具及来源收集
-│   └── runtime.py               create_agent、流式调用、checkpointer、失败恢复
-├── examples/english_notes.md    自编的示例资料，可通过界面上传
-├── docs/
-│   ├── demo.md                 真实截图、回答节选、来源与复现步骤
-│   └── screenshots/            8 张实际运行截图
-├── tests/
-│   ├── __init__.py              测试包入口
-│   ├── conftest.py              临时目录和离线 Embedding 测试替身
-│   ├── test_config_embeddings.py 配置、接口格式、批次、响应验证和错误脱敏
-│   ├── test_knowledge.py        切分、来源、重复入库、回滚和 MinerU 接入
-│   ├── test_agent_ui.py         Agent 工具循环、SQLite 恢复、会话隔离与界面
-│   └── test_http_tools.py       OpenAI 兼容流式请求、工具循环与 Tavily 来源处理
-├── README.md                    本操作说明
-├── .venv/                       uv 管理的解释器和依赖
-├── uploads/                     运行时保存原始文件（哈希命名）
-└── data/                        运行时生成
-    ├── catalog.sqlite           用户可见会话/消息/资料目录
-    ├── checkpoints.sqlite       Agent 消息、工具调用与内部状态
-    ├── index_config.json        防止混用不同模型或切分配置的索引
-    ├── parsed/                  MinerU/文本解析结果缓存
-    └── chroma/                  向量、文本片段、元数据
-```
-
-界面历史与 Agent 内部状态故意分开：页面只展示最终回答和来源，不直接显示工具 JSON。完整备份时，停止应用后一起复制 `data/` 和 `uploads/`；密钥另行保存。
-
-更改 Embedding 模型/维度或切分参数时，系统会阻止复用旧索引。MVP 最简单的重建方式是设置新的 `DATA_DIR` 后重启并重新上传；该目录也包含聊天数据库，因此旧聊天仍保留在原目录但不会出现在新目录的页面中。
-
-## 7. 开发检查与已知边界
+## 8. 测试
 
 ```powershell
-uv run pytest -q
-uv run ruff check .
-uv run python check_setup.py
+uv run --locked pytest -q
+uv run --locked ruff check .
+uv run --locked ruff format --check .
 ```
 
-测试使用临时 SQLite/Chroma、模拟 HTTP 和模拟聊天模型，不需要 Key、不访问外网，也不把模拟模型接入产品页面。真实百炼、MinerU、Tavily 的账号权限、额度、网络和最终教学质量，要在填写 `.env` 后验证。
+有 Node.js 时可以额外运行扩展纯逻辑测试（产品运行不需要 Node）：
 
-2026-09-28 本地交付检查：Python 3.13.15 环境安装完成；22 项测试通过；Ruff 检查与格式检查通过；Streamlit 本地启动成功，首页及 `/_stcore/health` 均返回 HTTP 200。未执行真实外部服务调用。
+```powershell
+node --test tests/extension_core.test.cjs
+```
 
-本版面向本机单用户。不要直接把服务公开到互联网。长聊天仍受模型上下文限制，本版未加入自动摘要；可以新建聊天继续。使用多模态 Embedding 不保证效果优于文本专用模型，需要以实际资料检索效果判断。
-
-## 8. 与参考材料的对应
-
-- 父目录 `app/agents/personal_cheif.py`：借鉴 `init_chat_model`、`create_agent`、Tavily、SqliteSaver、thread_id、流式输出的组织方式；没有移植 FastAPI 或 OSS。
-- 父目录《第1节 RAG Agent.md》：借鉴 MinerULoader、标题/递归切分、向量化、检索工具封装；内存向量库替换为持久化 Chroma，Embedding 替换为你指定型号的原生接口适配。
-- 父目录英语构想 MD：保留 Native English Usage Coach 定位、按需搜索、上传资料与会话上下文；按后续讨论改用 SQLite 持久化。
-
-接口核对资料：
-
-- https://help.aliyun.com/zh/model-studio/qwen-omni
-- https://help.aliyun.com/zh/model-studio/qwen-function-calling
-- https://help.aliyun.com/zh/model-studio/multimodal-embedding-api-reference
-- https://pypi.org/project/langchain-mineru/
-- https://docs.langchain.com/oss/python/integrations/vectorstores/chroma
-- https://reference.langchain.com/python/langgraph.checkpoint.sqlite/SqliteSaver
-- https://docs.astral.sh/uv/guides/projects/
-
-同时对照本地百炼技能原文 `raw/model-api-reference/vector-and-sort/multimodal-vector/multimodal-embedding-api-reference.md`。
+测试使用临时数据库和模拟模型，不调用你的付费模型。真实服务的验证范围见 [docs/verification.md](docs/verification.md)。接口清单见 [docs/api.md](docs/api.md)；机器可读规范为 `http://127.0.0.1:8000/openapi.json`。

@@ -1,0 +1,8 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>语境 · 视频伴学</title><link rel="stylesheet" href="sidepanel.css"><script src="core.js" defer></script><script src="sidepanel.js" defer></script></head><body>
+<header><div class="brand">语境 <span>视频伴学</span></div><button id="open-main">单词本 ↗</button></header>
+<details id="connection"><summary>连接设置</summary><label>本地服务地址<input id="base-url" value="http://127.0.0.1:8000"></label><label>从主网页复制的连接码<input id="token" type="password" autocomplete="off"></label><button id="connect">保存并连接</button><p class="muted">先运行项目启动脚本。首次加载扩展后，请刷新已经打开的 YouTube 页面。</p></details>
+<div class="controls"><label>英语水平<select id="level"><option>初级</option><option selected>中级</option><option>高级</option></select></label><button id="start" class="primary">开始伴学</button><button id="stop" disabled>暂停</button></div>
+<h1 id="video-title">从正在看的视频开始</h1><p id="status" role="status">连接本地服务后，打开有英文字幕的视频。</p><p id="source" class="muted"></p>
+<div id="card-space"><div class="empty">留意那些值得学的表达。<small>普通句子不会打扰你。原句和翻译只在展开后显示。</small></div></div>
+<p class="footnote">实际播放并展示的难点会自动保存到主网页单词本。模型的难度判断仅供参考。</p>
+</body></html>

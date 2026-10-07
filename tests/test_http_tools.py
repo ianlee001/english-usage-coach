@@ -21,6 +21,8 @@ def test_qwen_compatible_http_stream_and_tool_roundtrip(settings, monkeypatch):
         assert {tool["function"]["name"] for tool in body["tools"]} == {
             "search_materials",
             "web_search",
+            "search_vocabulary",
+            "get_video_context",
         }
         if len(requests) == 1:
             deltas = [
