@@ -1,0 +1,362 @@
+{
+  "figmaFile": "https://www.figma.com/design/SSKWRf7RIyYh62SzvAtjHX",
+  "exported": "2026-10-09",
+  "assets": [
+    {
+      "file": "screens/chat-answer.svg",
+      "figmaNodeId": "4:37",
+      "format": "svg",
+      "sizeBytes": 465050,
+      "sha256": "a452be410131007214fa02965e29c2d7162adec4e68e9eddcdbf1b8320efac4e",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-initial.svg",
+      "figmaNodeId": "4:35",
+      "format": "svg",
+      "sizeBytes": 328340,
+      "sha256": "2222952cd636828985a7bc2c98f9c1188af6a8396df6c87e2d0f89c549f6f8a2",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-question.svg",
+      "figmaNodeId": "4:36",
+      "format": "svg",
+      "sizeBytes": 309609,
+      "sha256": "1537007ccae3f99fe419b3c7455820b16c693e100ec53723df3452ac64c34424",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-sources.svg",
+      "figmaNodeId": "4:38",
+      "format": "svg",
+      "sizeBytes": 548170,
+      "sha256": "35a993f9464944f3fe4be1b4ccbcfb3605de9b837fbc62f83d67452bd61c8125",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-history.svg",
+      "figmaNodeId": "4:39",
+      "format": "svg",
+      "sizeBytes": 491114,
+      "sha256": "a2dceac68babaa999775a1f40b4ac26c3e7fca606cd783ef3b8091384cb38709",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/materials-list.svg",
+      "figmaNodeId": "4:40",
+      "format": "svg",
+      "sizeBytes": 352963,
+      "sha256": "cec0699bc3bca2203bf7ea819bb2eeb0bfd51dc6224cec9cb0797aa0d565451c",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/materials-importing.svg",
+      "figmaNodeId": "4:41",
+      "format": "svg",
+      "sizeBytes": 401041,
+      "sha256": "0b02d07a5cc7021e0152bc6e8433e5e4ad9d6d670fb8b2be03f6eef78d44a0c3",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/materials-success.svg",
+      "figmaNodeId": "4:42",
+      "format": "svg",
+      "sizeBytes": 393002,
+      "sha256": "5c0f4d4d09e389e0260b40f1dba3f8c636dd4a6794401d970cce1c1ba716893e",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/materials-failure.svg",
+      "figmaNodeId": "4:43",
+      "format": "svg",
+      "sizeBytes": 427997,
+      "sha256": "c0640dd67499841643f97a4c12df49912d2212f2c5ac081a1475b663b288901c",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-context-question.svg",
+      "figmaNodeId": "34:425",
+      "format": "svg",
+      "sizeBytes": 461337,
+      "sha256": "5baafbdd1d71c4a57fd022dd555dea0f1546b32f794910236b327c91c1604495",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/chat-context-answer.svg",
+      "figmaNodeId": "34:464",
+      "format": "svg",
+      "sizeBytes": 562006,
+      "sha256": "86d35a6c5b98656f3fe2f992a1ded0d23cbf942a65f2c66c7e2f5483aa67b189",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/vocabulary-list.svg",
+      "figmaNodeId": "4:44",
+      "format": "svg",
+      "sizeBytes": 458366,
+      "sha256": "3fd0f6eecfcb80194f14900de3b7632298b4f5e59f34ee93e3cc9399762efe0c",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/vocabulary-filter.svg",
+      "figmaNodeId": "4:45",
+      "format": "svg",
+      "sizeBytes": 361799,
+      "sha256": "eba40a1cd34b9fc129ccb92014b6e2bd3b8f7ca051d16e4dc221cf3112279813",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/vocabulary-context.svg",
+      "figmaNodeId": "4:46",
+      "format": "svg",
+      "sizeBytes": 446827,
+      "sha256": "f78514bd12eae9ff091006088bb253224938ab0d5e683b0d478ba54e8ead0a98",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/vocabulary-favorite.svg",
+      "figmaNodeId": "4:47",
+      "format": "svg",
+      "sizeBytes": 410121,
+      "sha256": "0130e18519bcc933ead4f9b4beb77df62736168aae43fc06578a5be32952d086",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/vocabulary-mastered.svg",
+      "figmaNodeId": "4:48",
+      "format": "svg",
+      "sizeBytes": 404920,
+      "sha256": "175de6bccc148b38e514581525afeba057ecc4ed39e065280327abe887c99361",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/settings-pair.svg",
+      "figmaNodeId": "4:49",
+      "format": "svg",
+      "sizeBytes": 389498,
+      "sha256": "c105777ecf6b2708c3ba75c18984d1f048d83b5c7a956e6b69893adddd3fdc73",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/settings-connected.svg",
+      "figmaNodeId": "4:50",
+      "format": "svg",
+      "sizeBytes": 373614,
+      "sha256": "64aae084efa484f760e22dea4461a022342fa278e1eb5511d0d30056498941ac",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/subtitle-importing.svg",
+      "figmaNodeId": "4:51",
+      "format": "svg",
+      "sizeBytes": 408509,
+      "sha256": "20cf4755e88f36e30b9d64d364e08afb2e04945a2912d421e079bfe42acf36f4",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/subtitle-success.svg",
+      "figmaNodeId": "4:52",
+      "format": "svg",
+      "sizeBytes": 415039,
+      "sha256": "5a7bddf42124d72c97c29368d6f70339e2d37261fdb55cdf12e7bf04f0bb0b5a",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/subtitle-failure.svg",
+      "figmaNodeId": "4:53",
+      "format": "svg",
+      "sizeBytes": 428810,
+      "sha256": "82e47f6a57b8ceeacd7581317e437f2866763774b5e758ed9845e50042c1bb96",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-idle.svg",
+      "figmaNodeId": "4:54",
+      "format": "svg",
+      "sizeBytes": 203180,
+      "sha256": "52d9cb23e171d5636b506d750417c19be1cf8dce07d2c5856412cd5d310a1032",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-preparing.svg",
+      "figmaNodeId": "4:55",
+      "format": "svg",
+      "sizeBytes": 210312,
+      "sha256": "295aca2598c0a0a4602b3e7d8e8cc607c6f45e067ea327eff9abc972abe62f49",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-card.svg",
+      "figmaNodeId": "4:56",
+      "format": "svg",
+      "sizeBytes": 310175,
+      "sha256": "bcb94c8f9869a5326f28de301e90ad41e9fe2324032cb76ff1f1deec74a4549a",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-expanded.svg",
+      "figmaNodeId": "4:57",
+      "format": "svg",
+      "sizeBytes": 376663,
+      "sha256": "7f4a2ce6f3fc8e2bb31bf93697bab04f34b98d950819b8a8c1275f6d63560a07",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-saving.svg",
+      "figmaNodeId": "4:58",
+      "format": "svg",
+      "sizeBytes": 300869,
+      "sha256": "180e14d2b61b5325f4acf6876daba44b843c98d2fc405feab23723f1e069ab3b",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-paused.svg",
+      "figmaNodeId": "4:59",
+      "format": "svg",
+      "sizeBytes": 188360,
+      "sha256": "1ced522b00a9f43159c71f8296cd756aab25015c786de6e436cd90ff16eff0da",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-no-subtitles.svg",
+      "figmaNodeId": "4:60",
+      "format": "svg",
+      "sizeBytes": 209970,
+      "sha256": "7ba5d2caaec8762517f21595d796068e3e23a0736ae18b2b0aa9ea29197e46fa",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-model-failure.svg",
+      "figmaNodeId": "4:61",
+      "format": "svg",
+      "sizeBytes": 203188,
+      "sha256": "9642adc0863807377357bfb19650513d3812ff7ed91cdce1700f2790804b352b",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-late.svg",
+      "figmaNodeId": "4:62",
+      "format": "svg",
+      "sizeBytes": 281212,
+      "sha256": "ca84156764c1a777486105bfbb354760e79ca4d7412c81921b0c2ba13a04b4ba",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-save-failure.svg",
+      "figmaNodeId": "4:63",
+      "format": "svg",
+      "sizeBytes": 314766,
+      "sha256": "fce7d00c031f13f8f10d1f6c8dea0a5b8d27f68a2e217287c1a4f73ca15119d7",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/explore-image.svg",
+      "figmaNodeId": "36:35",
+      "format": "svg",
+      "sizeBytes": 305880,
+      "sha256": "a4f438892c8186680aa611cf9490300b03af6d8e1f602c17a0b1ad9fb29bfdd2",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/explore-save-retry.svg",
+      "figmaNodeId": "36:52",
+      "format": "svg",
+      "sizeBytes": 361825,
+      "sha256": "7220e7c49ad06d352b01878b65588ec9489191d17573725e3a6ba4011192f50d",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "exports/01-chat-answer.png",
+      "figmaNodeId": "4:37",
+      "format": "png",
+      "sizeBytes": 75816,
+      "sha256": "e05820893a9ea90210f72d890737d57c360ad1d9baa8197c7f98ed4e46038f80",
+      "source": "Figma download_assets 原生导出",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "exports/02-materials-success.png",
+      "figmaNodeId": "4:42",
+      "format": "png",
+      "sizeBytes": 71145,
+      "sha256": "db61d1a3d962259b0772eeade3818c54acab99a95e497fa07a89c5259e3726c6",
+      "source": "Figma download_assets 原生导出",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "exports/03-vocabulary-context.png",
+      "figmaNodeId": "4:46",
+      "format": "png",
+      "sizeBytes": 75155,
+      "sha256": "e2951102b5831807a319df1f403438643c4cf4585d2ded8a1e04c73122773894",
+      "source": "Figma download_assets 原生导出",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "exports/04-settings-connected.png",
+      "figmaNodeId": "4:50",
+      "format": "png",
+      "sizeBytes": 72941,
+      "sha256": "f60d26df75c2555f662e03950d519c5056f39517d5fab2106c0af6bc1101e307",
+      "source": "Figma download_assets 原生导出",
+      "width": 1200,
+      "height": 900
+    },
+    {
+      "file": "exports/05-side-expanded.png",
+      "figmaNodeId": "4:57",
+      "format": "png",
+      "sizeBytes": 56414,
+      "sha256": "1734b4773c1afcc8f9f9b9a8c787d601c6ca469847b8005d7674c861ab160fa9",
+      "source": "Figma download_assets 原生导出",
+      "width": 400,
+      "height": 962
+    },
+    {
+      "file": "exports/06-side-save-failure.png",
+      "figmaNodeId": "4:63",
+      "format": "png",
+      "sizeBytes": 48950,
+      "sha256": "ed5653e993dd4b77d711f3bdabcbdbd3bba601cfd3692b12f1018e3b7073c767",
+      "source": "Figma download_assets 原生导出",
+      "width": 400,
+      "height": 900
+    },
+    {
+      "file": "screens/side-favorite.svg",
+      "figmaNodeId": "46:443",
+      "format": "svg",
+      "sizeBytes": 311884,
+      "sha256": "a05411fc7a6eae4881b7fd781701a05f674faf4bce9bce13bd5a825b5eb504bc",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-mastered.svg",
+      "figmaNodeId": "46:477",
+      "format": "svg",
+      "sizeBytes": 310824,
+      "sha256": "8b0775babd2a876a9d5dd6f0568d5a975ffc7dfe82bc4519ece580385a5ec09f",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-expanded-favorite.svg",
+      "figmaNodeId": "46:511",
+      "format": "svg",
+      "sizeBytes": 378463,
+      "sha256": "6d1ec0e6762da3e7e2ffb81b23ea557dbf2764ea9f8b3c4dab75cc3a0e83095f",
+      "source": "Figma download_assets 原生导出"
+    },
+    {
+      "file": "screens/side-expanded-mastered.svg",
+      "figmaNodeId": "46:547",
+      "format": "svg",
+      "sizeBytes": 377403,
+      "sha256": "79de5c4ad23cf9ed332ccb51132b4213d64009ca5995e7ef9cfccf1c348c8bcf",
+      "source": "Figma download_assets 原生导出"
+    }
+  ]
+}

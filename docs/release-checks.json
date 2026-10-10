@@ -1,0 +1,69 @@
+{
+  "checked_at": "2026-10-10",
+  "product_release": "v2",
+  "program_version": "0.2.0",
+  "showcase_tag": "v2-showcase-20261010",
+  "scope": "Local release material audit. External model responses in program tests are simulated. Native Figma primary preview was completed in the independent design delivery on 2026-10-09.",
+  "program_tests": {
+    "pytest_passed": 35,
+    "node_passed": 2,
+    "ruff_check": "passed",
+    "ruff_format_files": 36,
+    "paid_model_calls": 0
+  },
+  "documents": {
+    "markdown_files": 14,
+    "local_links": 210,
+    "anchors": 3,
+    "image_references": 28,
+    "broken_links": 0,
+    "requirements": 21,
+    "acceptance_rows": 12,
+    "test_cases": 24,
+    "simulated_ai_samples": 12,
+    "weighted_scores_recomputed": "passed",
+    "sql_fixture": "passed"
+  },
+  "figma": {
+    "existing_file": "https://www.figma.com/design/SSKWRf7RIyYh62SzvAtjHX",
+    "current_states": 35,
+    "exploration_frames": 2,
+    "click_routes": 245,
+    "automatic_transitions": 2,
+    "native_exports": 43,
+    "sha256_and_size_checks": "passed",
+    "manifest_matches_html": true,
+    "target_and_bounds_checks": "passed",
+    "sharing_changed": false,
+    "local_browser_recheck": "35 state images loaded; no horizontal overflow; chat question/answer/sources, sidebar favorite feedback, vocabulary context, return-video, context question/answer and save-failure replay paths clicked successfully on 2026-10-10"
+  },
+  "public_files": {
+    "candidate_count": 116,
+    "text_files_scanned": 97,
+    "credential_pattern_hits": 0,
+    "private_data_paths": 0,
+    "largest_file_bytes": 2358861
+  },
+  "pdf": {
+    "pages": 12,
+    "bytes": 2303544,
+    "clickable_links": 6,
+    "embedded_fonts": [
+      "/AAAAAA+MicrosoftYaHei-0",
+      "/AAAAAA+MicrosoftYaHei-Bold-0",
+      "/AAAAAB+MicrosoftYaHei-0",
+      "/AAAAAB+MicrosoftYaHei-Bold-0",
+      "/AAAAAC+MicrosoftYaHei-0"
+    ],
+    "rendered_pages": 12,
+    "visual_review": "passed; all-page contact sheet and individual design/vocabulary/validation pages inspected"
+  },
+  "git": {
+    "original_repository": "https://github.com/ianlee001/english-usage-coach",
+    "existing_tags_preserved": [
+      "v0.1.0",
+      "v0.2.0"
+    ],
+    "backend_feature_changes": false
+  }
+}

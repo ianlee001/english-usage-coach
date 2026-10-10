@@ -1,0 +1,7 @@
+# Preserve generated design artifacts and PDF bytes across Windows/Linux clones.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+docs/prototype/screens/*.svg binary
+docs/prototype/design-board.svg binary

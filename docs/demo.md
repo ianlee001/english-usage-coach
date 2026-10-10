@@ -1,10 +1,30 @@
-# 第二版实际运行演示
+# 语境 · English Usage Coach｜实际运行演示
 
-[返回项目首页](../README.md) · [第一版演示存档](demo-v1.md)
+> 产品第二版 v2 · 程序 v0.2.0 · 更新 2026-10-10
 
-本页展示 v0.2.0 的视频伴学和单词本。视频截图由使用者提供；单词本截图于 2026-10-07 从正在运行的本地主网页截取，使用已有学习记录，没有为展示生成虚拟数据。
+[项目首页](../README.md) · [工程案例](engineering-case-study.md) · [项目案例](product-case-study.md) · [PRD](prd.md) · [验证与验收](verification.md) · [第一版演示存档](demo-v1.md)
 
-## 1. 看 YouTube，在原生侧栏理解难点
+本页按对话、资料、视频与回顾任务组织真实使用证据。视频截图由使用者提供；单词本截图于 2026-10-07 从正在运行的本地主网页截取，使用已有学习记录，没有为展示生成虚拟数据。
+
+## 1. 学习对话：主动提问并继续学习
+
+2026-09-28 的真实对话从“今天学习实用英语表达”开始，按场景给出英文表达与中文说明；后续提问涉及 `based` 用法、网络引用与多轮上下文。
+
+![真实学习对话，v1 Streamlit 界面](screenshots/02-learning-chat.png)
+
+![真实历史会话入口，v1 界面](screenshots/08-chat-history.png)
+
+## 2. 学习资料：导入个人资料并核对依据
+
+同日导入的一份 PDF 显示 85 个片段。询问“2.3 时态问题主要讲的是什么”后，回答给出文件与第 14–16 页的来源线索。
+
+![真实资料入库状态，v1 界面](screenshots/01-document-import.png)
+
+![真实资料问答与页码来源，v1 界面](screenshots/06-rag-answer.png)
+
+前两节保留 v1 功能验证历史。v2 延续对话、资料与历史能力，使用新的浅蓝网页界面；当前设计见 [交互材料](prototype/README.md)。完整提问、来源映射及其他截图见 [v1 演示存档](demo-v1.md)。
+
+## 3. 看 YouTube，在原生侧栏理解难点
 
 视频为 **Germany's jobless youth | DW News**。使用者提供的截图中，播放器位于约 1:35，右侧显示 1:33 附近的表达：
 
@@ -19,7 +39,7 @@
 
 视频画面属于原视频发布者，本仓库仅用界面截图说明伴学功能，不包含视频文件。
 
-## 2. 回到主网页，在单词本复习
+## 4. 回到主网页，在单词本复习
 
 以下为当前浅蓝配色主网页的实际截图。页面显示 4 个已保存表达，来源筛选中可见上述 DW News 视频：
 
@@ -36,7 +56,23 @@
 
 聊天、历史和资料 RAG 仍从左侧导航进入。第一版的对话、PDF 检索和上下文案例保留在[旧版演示](demo-v1.md)，其中界面为旧 Streamlit 版本。
 
-## 3. 自己体验这条流程
+## 5. 原生设计与交互预览
+
+真实截图保留实际输出与版本；设计稿用于展示统一后的浅蓝界面、状态和恢复交互，内容统一标为示例。
+
+- [原生 Figma 文件](https://www.figma.com/design/SSKWRf7RIyYh62SzvAtjHX)：35 个当前状态，2 个独立探索画板，基础组件与 Auto layout。
+- [学习对话交互原型](https://www.figma.com/proto/SSKWRf7RIyYh62SzvAtjHX?node-id=4-35&starting-point-node-id=4%3A35&scaling=scale-down&content-scaling=fixed)；[视频伴学交互原型](https://www.figma.com/proto/SSKWRf7RIyYh62SzvAtjHX?node-id=4-54&starting-point-node-id=4%3A54&scaling=scale-down&content-scaling=fixed)。
+- [页面导出与使用说明](prototype/README.md)；[本地交互预览](prototype/index.html)。
+
+![当前学习对话，Figma 原生导出，示例内容](prototype/exports/01-chat-answer.png)
+
+![当前学习资料成功状态，Figma 原生导出，示例内容](prototype/exports/02-materials-success.png)
+
+![侧栏展开原句，Figma 原生导出，示例内容](prototype/exports/05-side-expanded.png)
+
+图片提问和保存就地重试放在独立探索页，未计入当前运行功能。收藏或掌握后保留侧栏状态反馈，点击单词本才进入主网页。
+
+## 6. 运行体验路径
 
 1. 按 [README](../README.md) 配置 `.env`，启动本地后端。
 2. 在 Chrome 加载项目的 `extension/`，通过主网页的“视频伴学”取得连接码并配对。
